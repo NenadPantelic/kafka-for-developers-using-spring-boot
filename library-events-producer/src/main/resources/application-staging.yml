@@ -1,0 +1,9 @@
+spring:
+  config:
+    activate:
+      on-profile: staging
+  kafka:
+    producer:
+      bootstrap-servers: staging:9092, staging:9093, staging:9094
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer

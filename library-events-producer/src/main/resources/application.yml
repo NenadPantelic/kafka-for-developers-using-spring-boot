@@ -1,0 +1,29 @@
+spring:
+  profiles:
+    active: local
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  kafka:
+    topic: "library-events"
+    producer:
+      bootstrap-servers: localhost:9092, localhost:9093, localhost:9094
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    admin:
+      properties:
+        bootstrap-servers: localhost:9092, localhost:9093, localhost:9094
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  kafka:
+    producer:
+      bootstrap-servers: prod:9092, prod:9093, prod:9094
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
