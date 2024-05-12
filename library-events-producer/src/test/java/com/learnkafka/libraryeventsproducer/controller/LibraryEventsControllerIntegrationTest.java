@@ -7,6 +7,7 @@ import com.learnkafka.libraryeventsproducer.fixture.LibraryEventFixtureUtil;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.assertj.core.api.Assertions;
@@ -49,10 +50,11 @@ class LibraryEventsControllerIntegrationTest {
         // embeds properties into a broker
         var configs = new HashMap<>(KafkaTestUtils.consumerProps(
                 "group1", // to identify a consumer (its id)
-                "true", // autocommit (once the record is ready, flush it
+                "true", // autocommit (once the record is ready, flush it)
                 embeddedKafkaBroker
         ));
         configs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // read only latest messages
+
         consumer = new DefaultKafkaConsumerFactory<>(
                 configs,
                 new IntegerDeserializer(), // key deserializer
