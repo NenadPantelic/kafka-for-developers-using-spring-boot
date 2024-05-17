@@ -17,9 +17,9 @@ public class LibraryEventsConsumer {
         this.libraryEventService = libraryEventService;
     }
 
-    @KafkaListener(topics = {"library-events"})
+    @KafkaListener(topics = {"library-events"}, groupId = "library-events-listener-group")
     public void onMessage(ConsumerRecord<Integer, String> consumerRecord) throws JsonProcessingException {
-        log.info("ConsumerRecord: {}", consumerRecord);
+        log.info("ConsumerRecord in retry consumer: {}", consumerRecord);
         libraryEventService.processLibraryEvent(consumerRecord);
     }
 }

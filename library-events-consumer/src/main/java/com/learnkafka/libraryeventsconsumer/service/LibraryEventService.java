@@ -6,6 +6,7 @@ import com.learnkafka.libraryeventsconsumer.entity.LibraryEvent;
 import com.learnkafka.libraryeventsconsumer.repository.LibraryEventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -26,6 +27,9 @@ public class LibraryEventService {
         log.info("Processing library event {}", consumerRecord);
 
         LibraryEvent libraryEvent = objectMapper.readValue(consumerRecord.value(), LibraryEvent.class);
+        if (libraryEvent.getLibraryEventId() != null && libraryEvent.getLibraryEventId() == 999) {
+            throw new RecoverableDataAccessException("Temporary network issue");
+        }
 
         switch (libraryEvent.getLibraryEventType()) {
             case NEW -> {

@@ -223,17 +223,35 @@ partition.
     - `ConcurrentMessageListenerContainer`
         - represents multiple `KafkaMessageListenerContainer`
 - `@KafkaListener` annotation (uses `ConcurrentMessageListenerContainer` behind the scene)
-  - the easiest way to build KafkaConsumer
-  
+    - the easiest way to build KafkaConsumer
+
 
 - Rebalance
-  - changing the partition ownership from one consumer to another
-  - there is a component called group coordinator which when the new consumer instance with the same group.id is brought
-  up, will rebalance the ownership of the partitions, so it evenly distribute them between the consumer instances
-  - and vice-versa, if a consumer is brought down, assignor will again rebalance the partitions
+    - changing the partition ownership from one consumer to another
+    - there is a component called group coordinator which when the new consumer instance with the same group.id is
+      brought
+      up, will rebalance the ownership of the partitions, so it evenly distribute them between the consumer instances
+    - and vice-versa, if a consumer is brought down, assignor will again rebalance the partitions
 
 - Offsets
-  - when the consumer polls and reads the records from Kafka, at the end it commits the offset to `__consumer_offsets` 
-  topic
-  - there are various committing offsets strategies; take into account that `poll()` actually reads multiple records at 
-  once
+    - when the consumer polls and reads the records from Kafka, at the end it commits the offset to `__consumer_offsets`
+      topic
+    - there are various committing offsets strategies; take into account that `poll()` actually reads multiple records
+      at
+      once
+
+### Recovery types
+
+1. Reprocess the failed record again
+    - if service the consumer interacts with is temporarily down
+2. Discard the message and move on
+    - invalid message: parsing error, invalid event
+
+Strategies - reprocess the message again:
+Option 1: publish the failed message to a retry topic (e.g. if the message could not be stored in topic books, then its
+retry topic could be topic.RETRY)
+Option 2: save the failed message in a DB and retry with scheduler
+
+Strategies - discard the message:
+Option 1: publish the failed record in to DeadLetter topic for tracking purposes
+Option 2: save the failed message into a DB for tracking purposes
