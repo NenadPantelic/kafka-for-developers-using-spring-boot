@@ -42,6 +42,8 @@ public class LibraryEventsProducer {
         String value = OBJECT_MAPPER.writeValueAsString(libraryEvent);
 
         // 1. blocking call - get metadata about the Kafka cluster (just for the first time the code is triggered)
+        // for how long it is going to be blocked if Kafka cluster is unavailable - defined by max.block.ms (default is
+        // 60s)
         // 2. Send message - returns a completable future (every time)
         CompletableFuture<SendResult<Integer, String>> completableFuture = kafkaTemplate.send(topic, key, value);
 

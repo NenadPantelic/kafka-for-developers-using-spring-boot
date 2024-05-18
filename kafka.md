@@ -255,3 +255,56 @@ Option 2: save the failed message in a DB and retry with scheduler
 Strategies - discard the message:
 Option 1: publish the failed record in to DeadLetter topic for tracking purposes
 Option 2: save the failed message into a DB for tracking purposes
+
+### Kafka producer error handling and recovery
+
+- Kafka Cluster is not available
+- if `acks=all` and some brokers are not available
+- `min.insync.replicas` config - this config means the number of produced replicas
+
+Two options to recover:
+- store the failed record in the database and set up a scheduler to retry sending that record
+- use a recovery topic to store failed record and add a consumer that will consume failed records and pass them to a 
+producer; the downside of this approach - if Kafka cluster is down, recovery topic will not be available.
+
+### Kafka security
+- Since the confidential information can be stored in Kafka, it is advised to use some security standards on top of it:
+    - SSL (Secure Socket Layer)/TLS (Transport Layer Security)
+    - SASL (Simple Authentication and Security Layer)
+  
+- SSL:
+  - Encryption
+  - Authentication
+
+- How SSL authentication works?
+1. You visit the website
+2. It sends it SSL certificate to browser
+3. Browser verifies its validity by checking its TrustStore and verifying the signature made by the Certificate Authority
+4. Client now knows that the server can be trusted
+....
+
+SSL requests - How to get SSL certificate?
+1. the keystore file is generated
+2. CSR - Certificate Signing Request is sent to CA
+3. CA verifies the identity of the domain by writing a file into that server and the server should respond confirming
+that the server actually is the owner of that particular domain
+4. CA issues a signed certificate
+5. the domain will install the certificate
+6. the browser sends a request to the domain
+7. it responds by sending its SSL cert
+8. browser verifies that the certificate is valid, i.e. checks in its TrustStore of CA Root certs to verify CA signature
+is valid
+9. the handshake is done and we have established a secure communication
+
+2 way SSL auth:
+- both Kafka client and Kafka cluster keep TrustStore and KeyStore meaning both of them will validate the credentials 
+of the other side
+
+SSL set up steps:
+1. Generate `server.keystore.jks`
+2. Set up local CA
+3. Create CSR (Certificate Signing Request)
+4. Sign the SSL certificate
+5. Add the signed SSL certificate to server.keystore file
+6. Configure the SSL cert in our Kafka broker
+7. Create `client.truststore.jks` for the client
